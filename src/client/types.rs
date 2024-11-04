@@ -202,5 +202,11 @@ pub struct BlockParams {
     pub max_gas: Option<u64>,
 }
 
+#[derive(Debug, Clone, PartialEq)]
+pub enum ChainVersionType {
+    Default,
+    Titan,
+}
+
 #[cfg(test)]
 mod tests {}

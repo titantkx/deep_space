@@ -16,6 +16,8 @@ use cosmos_sdk_proto::cosmos::tx::v1beta1::GetTxResponse;
 use cosmos_sdk_proto::tendermint::types::Block;
 use std::time::Duration;
 use std::time::Instant;
+use titan_cosmos_sdk_proto::cosmos::consensus::v1::query_client::QueryClient as TitanConsensusQueryClient;
+use titan_cosmos_sdk_proto::cosmos::consensus::v1::QueryParamsRequest as TitanConsensusQueryParamsRequest;
 use tokio::time::sleep;
 
 impl Contact {
@@ -121,6 +123,10 @@ impl Contact {
     /// This is extra useful because cosmos-sdk behaves very strangely when
     /// a transaction above the max allowed gas is submitted.
     pub async fn get_block_params(&self) -> Result<BlockParams, CosmosGrpcError> {
+        if self.chain_version_type == ChainVersionType::Titan {
+            return self.get_consensus_block_params().await;
+        }
+
         let res = self.get_param("baseapp", "BlockParams").await?;
         if let Some(v) = res.param {
             match serde_json::from_str(&v.value) {
@@ -137,6 +143,27 @@ impl Contact {
                 "No BlockParams? Deep Space probably needs to be upgraded".to_string(),
             ))
         }
+    }
+
+    pub async fn get_consensus_block_params(&self) -> Result<BlockParams, CosmosGrpcError> {
+        let mut grpc = TitanConsensusQueryClient::connect(self.url.clone()).await?;
+        let res = grpc
+            .params(TitanConsensusQueryParamsRequest {})
+            .await?
+            .into_inner();
+
+        // Convert the Option to a Result
+        let block_params = res
+            .params
+            .ok_or_else(|| CosmosGrpcError::BadResponse("No ConsensusParams?".to_string()))?
+            .block
+            .ok_or_else(|| CosmosGrpcError::BadResponse("No BlockParams?".to_string()))?;
+
+        let v: BlockParamsJson = BlockParamsJson {
+            max_bytes: block_params.max_bytes.to_string(),
+            max_gas: block_params.max_gas.to_string(),
+        };
+        Ok(v.into())
     }
 
     /// Queries a registered parameter given it's subspace and key, this should work

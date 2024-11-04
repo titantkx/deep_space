@@ -13,6 +13,7 @@ pub mod types;
 
 use cosmos_sdk_proto::cosmos::base::query::v1beta1::PageRequest;
 pub use types::ChainStatus;
+use types::ChainVersionType;
 
 use crate::{error::CosmosGrpcError, utils::ArrayString};
 
@@ -44,10 +45,17 @@ pub struct Contact {
     timeout: Duration,
     /// The prefix being used by this node / chain for Addresses
     chain_prefix: String,
+    /// The version of the chain we are talking to
+    chain_version_type: ChainVersionType,
 }
 
 impl Contact {
-    pub fn new(url: &str, timeout: Duration, chain_prefix: &str) -> Result<Self, CosmosGrpcError> {
+    pub fn new(
+        url: &str,
+        timeout: Duration,
+        chain_prefix: &str,
+        chain_version_type: Option<ChainVersionType>,
+    ) -> Result<Self, CosmosGrpcError> {
         let mut url = url;
         if !url.ends_with('/') {
             url = url.trim_end_matches('/');
@@ -57,6 +65,7 @@ impl Contact {
             url: url.to_string(),
             timeout,
             chain_prefix: chain_prefix.to_string(),
+            chain_version_type: chain_version_type.unwrap_or(ChainVersionType::Default),
         })
     }
 
@@ -89,7 +98,8 @@ mod tests {
     #[actix_rt::test]
     async fn test_endpoints() {
         env_logger::init();
-        let contact = Contact::new("http://gravitychain.io:9090", TIMEOUT, "gravity").unwrap();
+        let contact =
+            Contact::new("http://gravitychain.io:9090", TIMEOUT, "gravity", None).unwrap();
 
         let chain_status = contact.get_chain_status().await.unwrap();
         match chain_status {

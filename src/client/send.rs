@@ -440,7 +440,7 @@ mod tests {
     #[actix_rt::test]
     async fn test_send_to_althea() {
         env_logger::init();
-        let contact = Contact::new("http://localhost:9090", TIMEOUT, "althea").unwrap();
+        let contact = Contact::new("http://localhost:9090", TIMEOUT, "althea", None).unwrap();
         let mnemonic = "prepare meadow assault rifle biology animal visit eight purchase dinosaur question question inside sister ignore any airport tell ecology extend dove wrist mean comfort";
         let private_key: CosmosPrivateKey = PrivateKey::from_phrase(mnemonic, "").unwrap();
         let coin = Coin {
