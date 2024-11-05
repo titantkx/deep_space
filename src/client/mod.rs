@@ -64,6 +64,13 @@ impl Contact {
             url = url.trim_end_matches('/');
         }
         ArrayString::new(chain_prefix)?;
+        trace!(
+            "Creating new Contact instance for {} , prefix: {}, version: {:?}, gas_price: {:?}",
+            url,
+            chain_prefix,
+            chain_version_type,
+            gas_price
+        );
         Ok(Self {
             url: url.to_string(),
             timeout,

@@ -149,6 +149,7 @@ impl Contact {
         let fee = self
             .get_fee_info(messages, fee_coin, private_key.clone())
             .await?;
+        trace!("got fee info {:?}", fee);
         let args = self.get_message_args(our_address, fee).await?;
         trace!("got optional tx info");
 
