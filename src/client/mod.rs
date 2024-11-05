@@ -15,7 +15,7 @@ use cosmos_sdk_proto::cosmos::base::query::v1beta1::PageRequest;
 pub use types::ChainStatus;
 use types::ChainVersionType;
 
-use crate::{error::CosmosGrpcError, utils::ArrayString};
+use crate::{error::CosmosGrpcError, utils::ArrayString, Coin};
 
 pub const MEMO: &str = "Sent with Deep Space";
 
@@ -47,6 +47,8 @@ pub struct Contact {
     chain_prefix: String,
     /// The version of the chain we are talking to
     chain_version_type: ChainVersionType,
+    /// default gas price for transactions
+    gas_price: Option<Coin>,
 }
 
 impl Contact {
@@ -55,6 +57,7 @@ impl Contact {
         timeout: Duration,
         chain_prefix: &str,
         chain_version_type: Option<ChainVersionType>,
+        gas_price: Option<Coin>,
     ) -> Result<Self, CosmosGrpcError> {
         let mut url = url;
         if !url.ends_with('/') {
@@ -66,6 +69,7 @@ impl Contact {
             timeout,
             chain_prefix: chain_prefix.to_string(),
             chain_version_type: chain_version_type.unwrap_or(ChainVersionType::Default),
+            gas_price: gas_price,
         })
     }
 
@@ -98,8 +102,14 @@ mod tests {
     #[actix_rt::test]
     async fn test_endpoints() {
         env_logger::init();
-        let contact =
-            Contact::new("http://gravitychain.io:9090", TIMEOUT, "gravity", None).unwrap();
+        let contact = Contact::new(
+            "http://gravitychain.io:9090",
+            TIMEOUT,
+            "gravity",
+            None,
+            None,
+        )
+        .unwrap();
 
         let chain_status = contact.get_chain_status().await.unwrap();
         match chain_status {

@@ -21,6 +21,7 @@ use cosmos_sdk_proto::cosmos::tx::v1beta1::SimulateResponse;
 use cosmos_sdk_proto::cosmos::{
     base::abci::v1beta1::TxResponse, tx::v1beta1::service_client::ServiceClient as TxServiceClient,
 };
+use num256::Uint256;
 use std::time::Instant;
 use std::{clone::Clone, time::Duration};
 use tokio::time::sleep;
@@ -220,6 +221,22 @@ impl Contact {
                         gas_used, max_gas
                     )
                 }
+            }
+        }
+
+        // if `fee_token` is empty and `self.gas_price` is not empty, we calculate the fee by gas_used * 2 * gas_price
+        if fee_token.is_empty() {
+            if let Some(gas_price) = &self.gas_price {
+                let fee = Uint256::from(gas_used) * Uint256::from(2u64) * gas_price.amount;
+                return Ok(Fee {
+                    amount: vec![Coin {
+                        denom: gas_price.denom.clone(),
+                        amount: fee,
+                    }],
+                    granter: None,
+                    payer: None,
+                    gas_limit: gas_used * 2,
+                });
             }
         }
 
@@ -440,7 +457,7 @@ mod tests {
     #[actix_rt::test]
     async fn test_send_to_althea() {
         env_logger::init();
-        let contact = Contact::new("http://localhost:9090", TIMEOUT, "althea", None).unwrap();
+        let contact = Contact::new("http://localhost:9090", TIMEOUT, "althea", None, None).unwrap();
         let mnemonic = "prepare meadow assault rifle biology animal visit eight purchase dinosaur question question inside sister ignore any airport tell ecology extend dove wrist mean comfort";
         let private_key: CosmosPrivateKey = PrivateKey::from_phrase(mnemonic, "").unwrap();
         let coin = Coin {
