@@ -225,8 +225,8 @@ impl Contact {
             }
         }
 
-        // if `fee_token` is empty and `self.gas_price` is not empty, we calculate the fee by gas_used * 2 * gas_price
-        if fee_token.is_empty() {
+        // if `fee_token` is empty or contain zero amount and `self.gas_price` is not empty, we calculate the fee by gas_used * 2 * gas_price
+        if fee_token.is_empty() || (fee_token.len() == 1 && fee_token[0].amount.is_zero()) {
             if let Some(gas_price) = &self.gas_price {
                 let fee = Uint256::from(gas_used) * Uint256::from(2u64) * gas_price.amount;
                 return Ok(Fee {
