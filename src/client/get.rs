@@ -14,10 +14,10 @@ use cosmos_sdk_proto::cosmos::tx::v1beta1::service_client::ServiceClient as TxSe
 use cosmos_sdk_proto::cosmos::tx::v1beta1::GetTxRequest;
 use cosmos_sdk_proto::cosmos::tx::v1beta1::GetTxResponse;
 use cosmos_sdk_proto::tendermint::types::Block;
+use cosmos_sdk_proto_titan::cosmos::consensus::v1::query_client::QueryClient as TitanConsensusQueryClient;
+use cosmos_sdk_proto_titan::cosmos::consensus::v1::QueryParamsRequest as TitanConsensusQueryParamsRequest;
 use std::time::Duration;
 use std::time::Instant;
-use titan_cosmos_sdk_proto::cosmos::consensus::v1::query_client::QueryClient as TitanConsensusQueryClient;
-use titan_cosmos_sdk_proto::cosmos::consensus::v1::QueryParamsRequest as TitanConsensusQueryParamsRequest;
 use tokio::time::sleep;
 
 impl Contact {
