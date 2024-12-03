@@ -17,8 +17,6 @@ use std::{error::Error, str::Utf8Error};
 use std::{fmt, time::Duration};
 use tonic::transport::Error as TonicError;
 use tonic::Status;
-use tonic_v012::transport::Error as Tonicv012Error;
-use tonic_v012::Status as Statusv012;
 
 #[derive(Debug)]
 pub enum CosmosGrpcError {
@@ -31,14 +29,8 @@ pub enum CosmosGrpcError {
     ConnectionError {
         error: TonicError,
     },
-    ConnectionV012Error {
-        error: Tonicv012Error,
-    },
     RequestError {
         error: Status,
-    },
-    RequestV012Error {
-        error: Statusv012,
     },
     DecodeError {
         error: DecodeError,
@@ -84,13 +76,7 @@ impl Display for CosmosGrpcError {
             CosmosGrpcError::ConnectionError { error } => {
                 write!(f, "CosmosGrpc Connection error {error} {error:?}")
             }
-            CosmosGrpcError::ConnectionV012Error { error } => {
-                write!(f, "CosmosGrpc Connection error {error} {error:?}")
-            }
             CosmosGrpcError::RequestError { error } => {
-                write!(f, "CosmosGrpc Request error {error} {error:?}")
-            }
-            CosmosGrpcError::RequestV012Error { error } => {
                 write!(f, "CosmosGrpc Request error {error} {error:?}")
             }
             CosmosGrpcError::ChainNotRunning => {
@@ -145,21 +131,9 @@ impl From<TonicError> for CosmosGrpcError {
     }
 }
 
-impl From<Tonicv012Error> for CosmosGrpcError {
-    fn from(error: Tonicv012Error) -> Self {
-        CosmosGrpcError::ConnectionV012Error { error }
-    }
-}
-
 impl From<Status> for CosmosGrpcError {
     fn from(error: Status) -> Self {
         CosmosGrpcError::RequestError { error }
-    }
-}
-
-impl From<Statusv012> for CosmosGrpcError {
-    fn from(error: Statusv012) -> Self {
-        CosmosGrpcError::RequestV012Error { error }
     }
 }
 

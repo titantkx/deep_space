@@ -30,13 +30,12 @@ sha2 = "0.10"
 sha3 = {version = "0.10", optional = true}
 tokio = {version = "1", features = ["time"]}
 tonic = {version = "0.10", features = ["gzip"]}
-tonic_v012 = {package = "tonic", version = "0.12", features = ["default", "channel", "gzip"]}
 unicode-normalization = {version = "0.1"}
 
 althea_proto = {version = "0.5", optional = true}
 cosmos-sdk-proto = {package = "cosmos-sdk-proto-althea", version = "0.16"}
 # cosmos-sdk-proto = {git = "https://github.com/titantkx/titan-rust-proto.git", tag = "v3.0.1", package = "cosmos-sdk-proto-titan"}
-cosmos-sdk-proto-titan = {git = "https://github.com/titantkx/titan-rust-proto.git", tag = "v3.2.0", package = "cosmos-sdk-proto-titan", features = ['grpc']}
+cosmos-sdk-proto-titan = {git = "https://github.com/titantkx/titan-rust-proto.git", tag = "v3.4.0", package = "cosmos-sdk-proto-titan", features = ['grpc']}
 
 [dev-dependencies]
 actix-rt = "2.2"
